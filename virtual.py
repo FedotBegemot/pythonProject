@@ -11,7 +11,7 @@ data1 = 5
 
 
 class ExprEnum(enum.Enum):
-    PUSH = 0x00d00201,
+    PUSH = 0,
     # Получить значение со стека.Берется верхушка стека
     POP = 0x00d00205,
     # Сложить два верхних значения стека
@@ -39,7 +39,7 @@ ip = 0
 
 
 def decoder(instr, code):
-    if instr == 0x00d00201:
+    if instr == 0:
         code.push(stack[1])
     if instr == 0x00d00202:
         # Берем два верхних значения стека
