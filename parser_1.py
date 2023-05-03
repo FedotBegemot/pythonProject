@@ -41,6 +41,7 @@ class CmdCode(enum.Enum):
     COMPARISON = 14
     EQUAL = 15
     NEGATIVE = 16
+    JUMP = 17
 
     READ = 20
     WRITE = 21
@@ -211,6 +212,7 @@ class Interpreter:
         while index < len(program):
             index += 1
             cmd = program[index]
+            cmd.index = index
 
             if cmd.code == CmdCode.PUSH:
                 # stack.append(JSValue(cmd.params[0]))
@@ -318,14 +320,18 @@ class Interpreter:
                 stack.append(result)
                 continue
 
-            if cmd.code == CmdCode.DEF_FUNC:
-                func_dict[stack.pop()] = index
-                continue
+            if cmd.code == CmdCode.JUMP:
+                cmd.index = index
 
+            if cmd.code == CmdCode.DEF_FUNC:
+                f = stack.pop()
+                func_dict[f] = index
+                cmd.label = f.value
+                continue
+##TODO Сделать ссылку прямком на DEF_FUNC, т.к будем из любой точки ссылаться на объявление и высчитывать кол-во параметров и результат выполения ф-ции
             if cmd.code == CmdCode.CALL:
-                param_count = len(scope.vars)
-                # for i in range(int(param_count)):
-                #     lexical_env[] = scope.vars.pop()
+                jump_address = func_dict.get(cmd.label)
+                cmd.index = jump_address
                 continue
 
             if cmd.code == CmdCode.PRINT:
